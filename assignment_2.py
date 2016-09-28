@@ -49,7 +49,6 @@ def find_maximum_subarray_iterative(A, low=0, high=-1):
     mEij = [0, 0]
     for i, v in enumerate(A):
         tmpME = mE + v
-        print ("top",mSij)
         if tmpME > 0:
             mE = tmpME
             mEij[1] = i
@@ -60,6 +59,8 @@ def find_maximum_subarray_iterative(A, low=0, high=-1):
             mS = mE
             mSij[0], mSij[1] = mEij[0], mEij[1]
     return mSij,mS
+
+print (find_maximum_subarray_iterative([1,2,3,-5,2]))
 
 def square_matrix_multiply(A, B):
     """
