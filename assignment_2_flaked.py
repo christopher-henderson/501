@@ -1,19 +1,16 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Assignment 2 ASU SER 501."""
 from __future__ import division, print_function
 from numpy import asarray, zeros, random, dot
 from itertools import combinations_with_replacement
 
-# STOCK_PRICES  = [100,113,110,85,105,102,86,63,81,101,94,106,101,79,94,90,97]
-
 STOCK_PRICE_CHANGES = [
     13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7]
 
 
 def find_maximum_subarray_brute(A, low=0, high=-1):
-
     """
+    Brutish max subarray solution.
 
     Return a tuple (i,j) where A[i:j] is the maximum subarray.
     Implement the brute force method from chapter 4
@@ -40,7 +37,7 @@ def find_maximum_subarray_brute(A, low=0, high=-1):
 def find_maximum_crossing_subarray(A, low, mid,  high):
     """
 
-    Find the maximum subarray that crosses mid
+    Find the maximum subarray that crosses mid.
 
     Return a tuple (i,j) where A[i:j] is the maximum subarray.
 
@@ -110,11 +107,7 @@ def find_maximum_subarray_iterative(A, low=0, high=-1):
 
 
 def square_matrix_multiply(A, B):
-    """
-
-    Return the product AB of matrix multiplication.
-
-    """
+    """Return the product AB of matrix multiplication."""
     A = asarray(A)
     B = asarray(B)
     assert A.shape == B.shape
@@ -145,6 +138,7 @@ def square_matrix_multiply(A, B):
                                         A22, B22)
     return C
 
+
 def square_matrix_multiply_strassens(A, B):
     """
 
@@ -158,23 +152,62 @@ def square_matrix_multiply_strassens(A, B):
     assert A.shape == B.shape
     assert A.shape == A.T.shape
     assert (len(A) & (len(A) - 1)) == 0, "A is not a power of 2"
-    pass
+    A = asarray(A)
+    B = asarray(B)
+    assert A.shape == B.shape
+    assert A.shape == A.T.shape
+    C = zeros(A.shape)
+    if len(A[0]) is 1:
+        return A[0][0] * B[0][0]
+    mid = A.shape[1] // 2
+    A11 = A[:mid:, :mid:]
+    A12 = A[:mid:, mid:]
+    A21 = A[mid:, :mid:]
+    A22 = A[mid:, mid:]
+    B11 = B[:mid:, :mid:]
+    B12 = B[:mid:, mid:]
+    B21 = B[mid:, :mid:]
+    B22 = B[mid:, mid:]
+    S1 = B12 - B22
+    S2 = A11 + A12
+    S3 = A21 + A22
+    S4 = B21 - B11
+    S5 = A11 + A22
+    S6 = B11 + B22
+    S7 = A12 - A22
+    S8 = B21 + B22
+    S9 = A11 - A21
+    S10 = B11 + B12
+    P1 = square_matrix_multiply_strassens(A11, S1)
+    P2 = square_matrix_multiply_strassens(S2, B22)
+    P3 = square_matrix_multiply_strassens(S3, B11)
+    P4 = square_matrix_multiply_strassens(A22, S4)
+    P5 = square_matrix_multiply_strassens(S5, S6)
+    P6 = square_matrix_multiply_strassens(S7, S8)
+    P7 = square_matrix_multiply_strassens(S9, S10)
+    C = zeros(A.shape)
+    C[:mid:, :mid:] = P5 + P4 - P2 + P6
+    C[:mid:, mid:] = P1 + P2
+    C[mid:, :mid] = P3 + P4
+    C[mid:, mid:] = P5 + P1 - P3 - P7
+    return C
 
 
 def test():
+    """Test function."""
     # arr = [1, 2, 3, -3, 2]
     # brute = find_maximum_subarray_brute(arr)
     # recursive = find_maximum_subarray_recursive(arr)
     # iterative = find_maximum_subarray_iterative(arr)
     # assert brute == recursive and recursive == iterative
-    # for _ in range(10):
-    #     n = random.randint(1, 6)
-    #     A = random.randint(0, 1000, (2**n, 2**n))
-    #     B = random.randint(0, 1000, (2**n, 2**n))
-    #     C = square_matrix_multiply(A, B)
-    #     real = dot(A, B)
-    #     assert ((C == real).all())
-
+    for _ in range(10):
+        n = random.randint(1, 5)
+        A = random.randint(0, 1000, (2**n, 2**n))
+        B = random.randint(0, 1000, (2**n, 2**n))
+        recursive = square_matrix_multiply(A, B)
+        strassen = square_matrix_multiply_strassens(A, B)
+        real = dot(A, B)
+        assert ((recursive == real).all() and (strassen == real).all())
 
 
 if __name__ == '__main__':
