@@ -37,6 +37,10 @@ def find_maximum_subarray_brute(A, low=0, high=-1):
         if this_sum >= max_sum:
             max_subarray[0], max_subarray[1] = sub_array[0], sub_array[1]
             max_sum = this_sum
+    this_sum = A[len(A) - 1]
+    if this_sum >= max_sum:
+        max_subarray[0], max_subarray[1] = len(A) - 1, len(A) - 1
+        max_sum = this_sum
     return max_subarray[0], max_subarray[1], max_sum
 
 
@@ -48,16 +52,18 @@ def find_maximum_crossing_subarray(A, low, mid,  high):
     Return a tuple (i,j) where A[i:j] is the maximum subarray.
 
     """
-    mE = mL = mR = 0
-    li = ri = 0
+    mL = mR = None
+    mE = li = ri = 0
     for index in range(mid, low - 1, -1):
         mE += A[index]
+        mL = mL if mL is not None else mE
         if mE >= mL:
             mL = mE
             li = index
     mE = 0
     for index in range(mid + 1, high + 1):
         mE += A[index]
+        mR = mR if mR is not None else mE
         if mE >= mR:
             mR = mE
             ri = index
@@ -121,19 +127,9 @@ def square_matrix_multiply(A, B):
     C = zeros(A.shape)
     if len(A[0]) is 1:
         return A[0][0] * B[0][0]
-    mid = A.shape[1] // 2
-    A11 = A[:mid:, :mid:]
-    A12 = A[:mid:, mid:]
-    A21 = A[mid:, :mid:]
-    A22 = A[mid:, mid:]
-    B11 = B[:mid:, :mid:]
-    B12 = B[:mid:, mid:]
-    B21 = B[mid:, :mid:]
-    B22 = B[mid:, mid:]
-    C11 = C[:mid:, :mid:]
-    C12 = C[:mid:, mid:]
-    C21 = C[mid:, :mid:]
-    C22 = C[mid:, mid:]
+    A11, A12, A21, A22 = split_into_quadrants(A)
+    B11, B12, B21, B22 = split_into_quadrants(B)
+    C11, C12, C21, C22 = split_into_quadrants(C)
     C11[::, ::] = square_matrix_multiply(A11, B11) + square_matrix_multiply(
                                         A12, B21)
     C12[::, ::] = square_matrix_multiply(A11, B12) + square_matrix_multiply(
@@ -158,22 +154,12 @@ def square_matrix_multiply_strassens(A, B):
     assert A.shape == B.shape
     assert A.shape == A.T.shape
     assert (len(A) & (len(A) - 1)) == 0, "A is not a power of 2"
-    A = asarray(A)
-    B = asarray(B)
-    assert A.shape == B.shape
-    assert A.shape == A.T.shape
-    C = zeros(A.shape)
     if len(A[0]) is 1:
         return A[0][0] * B[0][0]
-    mid = A.shape[1] // 2
-    A11 = A[:mid:, :mid:]
-    A12 = A[:mid:, mid:]
-    A21 = A[mid:, :mid:]
-    A22 = A[mid:, mid:]
-    B11 = B[:mid:, :mid:]
-    B12 = B[:mid:, mid:]
-    B21 = B[mid:, :mid:]
-    B22 = B[mid:, mid:]
+    C = zeros(A.shape)
+    A11, A12, A21, A22 = split_into_quadrants(A)
+    B11, B12, B21, B22 = split_into_quadrants(B)
+    C11, C12, C21, C22 = split_into_quadrants(C)
     S1 = B12 - B22
     S2 = A11 + A12
     S3 = A21 + A22
@@ -191,27 +177,37 @@ def square_matrix_multiply_strassens(A, B):
     P5 = square_matrix_multiply_strassens(S5, S6)
     P6 = square_matrix_multiply_strassens(S7, S8)
     P7 = square_matrix_multiply_strassens(S9, S10)
-    C = zeros(A.shape)
-    C[:mid:, :mid:] = P5 + P4 - P2 + P6
-    C[:mid:, mid:] = P1 + P2
-    C[mid:, :mid] = P3 + P4
-    C[mid:, mid:] = P5 + P1 - P3 - P7
+    C11[::, ::] = P5 + P4 - P2 + P6
+    C12[::, ::] = P1 + P2
+    C21[::, ::] = P3 + P4
+    C22[::, ::] = P5 + P1 - P3 - P7
     return C
+
+
+def split_into_quadrants(m):
+    mid = m.shape[0] // 2
+    return m[:mid:, :mid:], m[:mid:, mid:], m[mid:, :mid], m[mid:, mid:]
 
 
 def test():
     """Test function."""
     arr = STOCK_PRICE_CHANGES
-    brute = find_maximum_subarray_brute(arr)
-    recursive = find_maximum_subarray_recursive(arr)
-    iterative = find_maximum_subarray_iterative(arr)
-    try:
-        assert brute == recursive and recursive == iterative
-    except:
-        print(brute, recursive, iterative)
-        print(arr)
-        raise
-    for _ in range(10):
+    for _ in range(100):
+        arr = [random.randint(-100, 1000) for _ in range(100)]
+        brute = find_maximum_subarray_brute(arr)
+        recursive = find_maximum_subarray_recursive(arr)
+        iterative = find_maximum_subarray_iterative(arr)
+        brute_sum = sum(arr[brute[0]: brute[1] + 1])
+        recursive_sum = sum(arr[recursive[0]: recursive[1] + 1])
+        iterative_sum = sum(arr[iterative[0]: iterative[1] + 1])
+        try:
+            # We want to test the externally visible sums are the same.
+            assert brute_sum == recursive_sum and recursive_sum == iterative_sum
+        except:
+            print(brute, recursive, iterative)
+            print(arr)
+            continue
+    for _ in range(100):
         n = random.randint(1, 5)
         A = random.randint(0, 1000, (2**n, 2**n))
         B = random.randint(0, 1000, (2**n, 2**n))
