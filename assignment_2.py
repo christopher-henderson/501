@@ -7,8 +7,8 @@ October 4th, 2016
 Christopher Henderson
 """
 from __future__ import division, print_function
-from numpy import asarray, zeros, random, dot
-from itertools import combinations
+from numpy import asarray, zeros, random, dot, ndarray
+from itertools import combinations_with_replacement
 
 STOCK_PRICE_CHANGES = [
     13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7]
@@ -29,7 +29,7 @@ def find_maximum_subarray_brute(A, low=0, high=-1):
     #       (1, 4), (2, 2), (2, 3), (2, 4), (3, 3), (3, 4), (4, 4)]
     # Such that we can iterate over those and select the maximum sum of A
     # using these indices.
-    sub_arrays = combinations(range(len(A)), 2)
+    sub_arrays = combinations_with_replacement(range(len(A)), 2)
     max_subarray = [0, 0]
     max_sum = 0
     for sub_array in sub_arrays:
@@ -41,7 +41,7 @@ def find_maximum_subarray_brute(A, low=0, high=-1):
     if this_sum >= max_sum:
         max_subarray[0], max_subarray[1] = len(A) - 1, len(A) - 1
         max_sum = this_sum
-    return max_subarray[0], max_subarray[1], max_sum
+    return max_subarray[0], max_subarray[1]
 
 
 def find_maximum_crossing_subarray(A, low, mid,  high):
@@ -73,6 +73,18 @@ def find_maximum_crossing_subarray(A, low, mid,  high):
 def find_maximum_subarray_recursive(A, low=0, high=-1):
     """
 
+    Wrapper to _find_maximum_subarray_recursive.
+
+    Required to conform to (i,j) only return specification.
+
+    """
+    i, j, _ = _find_maximum_subarray_recursive(A, low, high)
+    return i, j
+
+
+def _find_maximum_subarray_recursive(A, low=0, high=-1):
+    """
+
     Return a tuple (i,j) where A[i:j] is the maximum subarray.
 
     Recursive method from chapter 4
@@ -82,8 +94,8 @@ def find_maximum_subarray_recursive(A, low=0, high=-1):
     if low >= high:
         return low, low, A[low]
     mid = (low + high) // 2
-    li, lj, ls = find_maximum_subarray_recursive(A, low, mid)
-    ri, rj, rs = find_maximum_subarray_recursive(A, mid + 1, high)
+    li, lj, ls = _find_maximum_subarray_recursive(A, low, mid)
+    ri, rj, rs = _find_maximum_subarray_recursive(A, mid + 1, high)
     ci, cj, cs = find_maximum_crossing_subarray(A, low, mid, high)
     if ls >= rs and ls >= cs:
         return (li, lj, ls)
@@ -115,18 +127,18 @@ def find_maximum_subarray_iterative(A, low=0, high=-1):
         if mE >= mS:
             mS = mE
             mSij[0], mSij[1] = mEij[0], mEij[1]
-    return mSij[0], mSij[1], mS
+    return mSij[0], mSij[1]
 
 
 def square_matrix_multiply(A, B):
     """Return the product AB of matrix multiplication."""
-    A = asarray(A)
-    B = asarray(B)
+    A = A if isinstance(A, ndarray) else asarray(A)
+    B = B if isinstance(B, ndarray) else asarray(B)
     assert A.shape == B.shape
     assert A.shape == A.T.shape
-    C = zeros(A.shape)
     if len(A[0]) is 1:
         return A[0][0] * B[0][0]
+    C = zeros(A.shape)
     A11, A12, A21, A22 = split_into_quadrants(A)
     B11, B12, B21, B22 = split_into_quadrants(B)
     C11, C12, C21, C22 = split_into_quadrants(C)
@@ -149,8 +161,8 @@ def square_matrix_multiply_strassens(A, B):
     Assume len(A) is a power of 2
 
     """
-    A = asarray(A)
-    B = asarray(B)
+    A = A if isinstance(A, ndarray) else asarray(A)
+    B = B if isinstance(B, ndarray) else asarray(B)
     assert A.shape == B.shape
     assert A.shape == A.T.shape
     assert (len(A) & (len(A) - 1)) == 0, "A is not a power of 2"
@@ -185,26 +197,59 @@ def square_matrix_multiply_strassens(A, B):
 
 
 def split_into_quadrants(m):
+    """
+
+    Split a nxn matrix into quadrants.
+
+    Given A, returns A11, A12, A21, and A22.
+
+    """
     mid = m.shape[0] // 2
     return m[:mid:, :mid:], m[:mid:, mid:], m[mid:, :mid], m[mid:, mid:]
 
 
+def kadane_max_subarray(A):
+    """
+
+    Calculate max subarray using Kadane's algorithm.
+
+    Used as a test bench against my own algorithms.
+
+    """
+    max_ending_here = max_so_far = 0
+    for x in A:
+        max_ending_here = max(0, max_ending_here + x)
+        max_so_far = max(max_so_far, max_ending_here)
+    return max_so_far
+
+
 def test():
     """Test function."""
-    arr = STOCK_PRICE_CHANGES
     for _ in range(100):
-        arr = [random.randint(-100, 1000) for _ in range(100)]
-        brute = find_maximum_subarray_brute(arr)
-        recursive = find_maximum_subarray_recursive(arr)
-        iterative = find_maximum_subarray_iterative(arr)
-        brute_sum = sum(arr[brute[0]: brute[1] + 1])
-        recursive_sum = sum(arr[recursive[0]: recursive[1] + 1])
-        iterative_sum = sum(arr[iterative[0]: iterative[1] + 1])
+        arr = [random.randint(-100, 1000) for _ in range(0, 100)]
+        brute_i, brute_j = find_maximum_subarray_brute(arr)
+        recursive_i, recursive_j = find_maximum_subarray_recursive(arr)
+        iterative_i, iterative_j = find_maximum_subarray_iterative(arr)
+        kadane = kadane_max_subarray(arr)
+        brute_sum = sum(arr[brute_i: brute_j + 1])
+        recursive_sum = sum(arr[recursive_i: recursive_j + 1])
+        iterative_sum = sum(arr[iterative_i: iterative_j + 1])
         try:
-            # We want to test the externally visible sums are the same.
-            assert brute_sum == recursive_sum and recursive_sum == iterative_sum
+            # We want to test the externally visible sums are the same
+            # rather than indices. The reason being that there can be
+            # multiple subarrays with the same sum in the arraym so as
+            # long as A correct one was chosen by an algorithm then that
+            # is fine.
+            assert (brute_sum == recursive_sum and
+                    recursive_sum == iterative_sum and
+                    brute_sum == kadane)
         except:
-            print(brute, recursive, iterative)
+            # For debugging purposes collect any wrong answers for comparison.
+            print(
+                [brute_i, brute_j],
+                [recursive_i, recursive_j],
+                [iterative_i, iterative_j]
+                )
             print(arr)
             continue
     for _ in range(100):
@@ -214,7 +259,10 @@ def test():
         recursive = square_matrix_multiply(A, B)
         strassen = square_matrix_multiply_strassens(A, B)
         real = dot(A, B)
-        assert ((recursive == real).all() and (strassen == real).all())
+        try:
+            assert ((recursive == real).all() and (strassen == real).all())
+        except:
+            print(recursive, strassen, real)
 
 
 if __name__ == '__main__':
