@@ -1,7 +1,5 @@
-#TODO: Get rid of all flake8 warnings -- that means adding docstrings
-#      to the file, classes, and methods.
+# -*- coding: utf-8 -*-
 
-#=============================================================================
 
 class SinglyLinkedNode(object):
 
@@ -90,9 +88,11 @@ class SinglyLinkedList(object):
         s = "List:" + "->".join([item for item in self])
         return s
 
-#=============================================================================
+# =============================================================================
+
 
 class BinaryTreeNode(object):
+
     def __init__(self, data=None, key=None, left=None, right=None, parent=None):
         super(BinaryTreeNode, self).__init__()
         self.key = key
@@ -141,12 +141,12 @@ class BinaryTreeNode(object):
             node.parent = self
             self.left = node
             return 1
-        elif node < self:
-            return self.left.add(node)
         elif node > self and self.right is None:
             node.parent = self
             self.right = node
             return 1
+        elif node < self:
+            return self.left.add(node)
         else:
             return self.right.add(node)
 
@@ -166,7 +166,6 @@ class BinaryTreeNode(object):
             return key in self.left if self.left is not None else False
         if self.key > key:
             return key in self.right if self.right is not None else False
-
 
 
 class BinarySearchTreeDict(object):
@@ -233,17 +232,17 @@ class BinarySearchTreeDict(object):
         #      line and PREORDER on the next
         return (
             ", ".join(self.inorder_keys()) + "\n" +
-            ", ",join(self.preorder_keys()
+            ", ".join(self.preorder_keys())
             )
 
 
-#=============================================================================
+# =============================================================================
+
 
 class ChainedHashDict(object):
 
     def __init__(self, bin_count=10, max_load=0.7, hashfunc=hash):
-        super(ChainedHash, self).__init__()
-
+        super(ChainedHashDict, self).__init__()
         # TODO: Construct a new table
         pass
 
@@ -335,7 +334,6 @@ class OpenAddressHashDict(object):
         # TODO: Return a string showing the table with multiple lines
         # TODO: I want the string to show which items are in which bins
         pass
-
 
 
 def terrible_hash(bin):
