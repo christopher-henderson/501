@@ -191,6 +191,22 @@ class BinaryTreeNode(object):
         self.right.parent = self.parent
         return self
 
+    def __contains__(self, item):
+        if self == item:
+            return True
+        if self < item:
+            return item in self.right
+        if self > item:
+            return item in self.left
+
+    def __eq__(self, other):
+        if isinstance(other, BinaryTreeNode):
+            return self.key == other.key
+        return self.key == other
+
+    def __ne__(self, other):
+        return not self == other
+
     def __gt__(self, other):
         if isinstance(other, BinaryTreeNode):
             return self.key > other.key
@@ -275,7 +291,7 @@ def main():
     print(b.display())
     print(b.height)
     del b["a"]
-    print(b.display())
+    print("i" in b)
 
 
 
