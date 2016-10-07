@@ -114,23 +114,29 @@ class BinaryTreeNode(object):
 
     def inorder(self):
         if self.left is not None:
-            yield self.left.inorder()
+            for k, v in self.left.inorder():
+                yield k, v
         yield self.key, self.data
         if self.right is not None:
-            yield self.right.inorder()
+            for k, v in self.right.inorder():
+                yield k, v
 
     def preorder(self):
         yield self.key, self.data
         if self.left is not None:
-            yield self.left.preorder
+            for k, v in self.left.preorder():
+                yield k, v
         if self.right is not None:
-            yield self.right.preorder
+            for k, v in self.right.preorder():
+                yield k, v
 
     def postorder(self):
         if self.left is not None:
-            yield self.left.preorder
+            for k, v in self.left.postorder():
+                yield k, v
         if self.right is not None:
-            yield self.right.preorder
+            for k, v in self.right.postorder():
+                yield k, v
         yield self.key, self.data
 
     def add(self, node):
@@ -149,6 +155,50 @@ class BinaryTreeNode(object):
             return self.left.add(node)
         else:
             return self.right.add(node)
+
+    def replace_with(self, replacement):
+        print (replacement.key)
+        replacement.parent = self.parent
+        replacement.left = self.left if self.left else replacement.left
+        replacement.right = self.right if self.right else replacement.right
+        if self.parent is not None:
+            if self.parent.left is self:
+                self.parent.left = replacement
+            else:
+                self.parent.right = replacement
+        if self.left is not None:
+            self.left.parent = replacement
+        if self.right is not None:
+            self.right.parent = replacement
+        return replacement
+
+    def delete(self, key):
+        if key < self.key and self.left is not None:
+            return self.left.delete(key)
+        if key > self.key and self.right is not None:
+            return self.right.delete(key)
+        if key != self.key:
+            raise Exception("Element {K} not found".format(K=key))
+        if self.left is not None and self.right is None:
+            return self.replace_with(self.left)
+        elif self.left is None and self.right is not None:
+            return self.replace_with(self.right)
+        else:
+            return self.replace_with(self.right.pop_minimum())
+
+    def pop_minimum(self):
+        if self.left is not None:
+            return self.left.pop_minimum()
+        if self.right is not None:
+            self.right.parent = self.parent
+            if self.parent is not None:
+                self.parent.left = self.right
+        elif self.parent is not None:
+            self.parent.left = None
+        self.parent = None
+        self.right = None
+        self.left = None
+        return self
 
     def __eq__(self, other):
         return self.key == other.key
@@ -182,6 +232,8 @@ class BinarySearchTreeDict(object):
         return self.root.height()
 
     def inorder_keys(self):
+        if self.root is None:
+            return iter(())
         return (key for key, _ in self.items())
 
     def postorder_keys(self):
@@ -206,9 +258,9 @@ class BinarySearchTreeDict(object):
                 return v
         return None
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, data):
         # TODO:
-        node = BinaryTreeNode(key, value)
+        node = BinaryTreeNode(key=key, data=data)
         if self.root is None:
             self.root = node
             self.size += 1
@@ -217,7 +269,11 @@ class BinarySearchTreeDict(object):
 
     def __delitem__(self, key):
         # TODO
-        pass
+        if self.root is None:
+            return
+        replacement = self.root.delete(key)
+        if self.root.key == key:
+            self.root = replacement
 
     def __contains__(self, key):
         # TODO
@@ -231,8 +287,8 @@ class BinarySearchTreeDict(object):
         # TODO: Print the keys using INORDER on one
         #      line and PREORDER on the next
         return (
-            ", ".join(self.inorder_keys()) + "\n" +
-            ", ".join(self.preorder_keys())
+            ", ".join(str(k) for k in self.inorder_keys()) + "\n" +
+            ", ".join(str(k) for k in self.preorder_keys())
             )
 
 
@@ -359,6 +415,14 @@ def terrible_hash(bin):
 
 
 def main():
+    b = BinarySearchTreeDict()
+    b['b'] = 1
+    b['a'] = 2
+    b['c'] = 3
+    print (b.root.right.data)
+    # print(b.display())
+    del b["b"]
+    print(b.display())
     # Thoroughly test your program and produce useful out.
     #
     # Do at least these kinds of tests:
