@@ -161,10 +161,7 @@ class BinaryTreeNode(object):
             self.right.delete(key)
             return self
         if self.left and self.right:
-            if self.right.height > self.left.height:
-                replacement = self.right.pop_minimum()
-            else:
-                replacement = self.left.pop_minimum
+            replacement = self.right.pop_minimum()
             self.parent.replace_child(self, replacement)
             replacement.parent = self.parent
             if self.left is not replacement:
@@ -283,15 +280,17 @@ class BinarySearchTreeDict(object):
 def main():
     b = BinarySearchTreeDict()
     b['i'] = 1
-    b['a'] = 2
-    b['b'] = 3
+    b['b'] = 2
+    b['a'] = 3
     b['c'] = 3
     b['d'] = 3
     b['j'] = 3
-    print(b.display())
-    print(b.height)
-    del b["a"]
-    print("i" in b)
+    # print(b.display())
+    # print(b.height)
+    print(b.root.key)
+    del b["i"]
+    print(b.root.key)
+    # print("i" in b)
 
 
 
