@@ -30,6 +30,12 @@ class SinglyLinkedNode(object):
     def next(self, next):
         self._next = next
 
+    def __nonzero__(self):
+        return self.item is not None
+
+    def __bool__(self):
+        return self.__nonzero__()
+
     def __repr__(self):
         return repr(self.item)
 

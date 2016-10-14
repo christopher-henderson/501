@@ -68,6 +68,7 @@ class ChainedHashDict(object):
         # TODO
         address = self._address(key)
         self.table[address].remove(key, lambda node, key: node.key == key)
+        self.size -= 1
 
     def __contains__(self, key):
         # TODO
@@ -89,8 +90,7 @@ class ChainedHashDict(object):
         # TODO: I want the string to show which items are in which bins
         print("{")
         for index, linked_list in enumerate(self.table):
-            line = "\t[{BIN}]=> {LIST}".format(BIN=index, LIST=linked_list)
-            print(line)
+            print("\t[{BIN}]=> {LIST}".format(BIN=index, LIST=linked_list))
         print("}")
 
 
