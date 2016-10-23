@@ -1,395 +1,306 @@
 # -*- coding: utf-8 -*-
 
+"""Testing file for assignment 3."""
 
-class SinglyLinkedNode(object):
+from bst import BinarySearchTreeDict
+from chained_hash_dict import ChainedHashDict
+from linked_list import SinglyLinkedList
+from openaddresshash import OpenAddressHashDict
 
-    def __init__(self, item=None, next_link=None):
-        super(SinglyLinkedNode, self).__init__()
-        self._item = item
-        self._next = next_link
-
-    @property
-    def item(self):
-        return self._item
-
-    @item.setter
-    def item(self, item):
-        self._item = item
-
-    @property
-    def next(self):
-        return self._next
-
-    @next.setter
-    def next(self, next):
-        self._next = next
-
-    def __repr__(self):
-        return repr(self.item)
+from itertools import chain
+from random import randrange
+from random import shuffle
+from types import FunctionType
 
 
-class SinglyLinkedList(object):
-
-    def __init__(self):
-        super(SinglyLinkedList, self).__init__()
-        self.head = None
-        self.length = 0
-
-    def __len__(self):
-        # TODO
-        return self.length
-
-    def __iter__(self):
-        # TODO
-        node = self.head
-        while node is not None:
-            yield node
-            node = node.next
-
-    def __contains__(self, item):
-        # TODO
-        for node in self:
-            if node.item == item:
-                return True
-        return False
-
-    def remove(self, item):
-        # TODO: find item and remove it.
-
-        previous = None
-        current = self.head
-        while current is not None:
-            found = current.item == item
-            if found and current is self.head:
-                value = self.head.item
-                self.head = self.head.next
-                self.length -= 1
-                return value
-            elif found:
-                previous.next = current.next
-                self.length -= 1
-                return current.item
-            else:
-                previous = current
-                current = current.next
-        return None
-
-    def prepend(self, item):
-        # TODO ad item to the front of the list
-        node = SinglyLinkedNode(item)
-        if self.head is None:
-            self.head = node
-        else:
-            node.next = self.head
-            self.head = node
-        self.length += 1
-
-    def __repr__(self):
-        s = "List:" + "->".join([item for item in self])
-        return s
-
-# =============================================================================
+def test_linked_list_empty():
+    """test_linked_list_empty."""
+    ll = SinglyLinkedList()
+    for _ in ll:
+        raise AssertionError("Collection should be empty, iterator returned.")
+    assert not any(value in ll for value in range(-100, 100))
+    assert ll.remove(5) is None
+    assert len(ll) is 0
+    print("No items, ", ll)
+    print("Passed all tests for empty linked list.")
 
 
-class BinaryTreeNode(object):
-
-    def __init__(self, data=None, key=None, left=None, right=None, parent=None):
-        super(BinaryTreeNode, self).__init__()
-        self.key = key
-        self.data = data
-        self.left = left
-        self.right = right
-        self.parent = parent
-
-    def height(self, height=0):
-        if self.left is not None:
-            left_height = self.left.height(height + 1)
-        else:
-            left_height = height
-        if self.right is not None:
-            right_height = self.right.height(height + 1)
-        else:
-            right_height = height
-        return max(left_height, right_height)
-
-    def inorder(self):
-        if self.left is not None:
-            for k, v in self.left.inorder():
-                yield k, v
-        yield self.key, self.data
-        if self.right is not None:
-            for k, v in self.right.inorder():
-                yield k, v
-
-    def preorder(self):
-        yield self.key, self.data
-        if self.left is not None:
-            for k, v in self.left.preorder():
-                yield k, v
-        if self.right is not None:
-            for k, v in self.right.preorder():
-                yield k, v
-
-    def postorder(self):
-        if self.left is not None:
-            for k, v in self.left.postorder():
-                yield k, v
-        if self.right is not None:
-            for k, v in self.right.postorder():
-                yield k, v
-        yield self.key, self.data
-
-    def add(self, node):
-        if self == node:
-            self.value = node.value
-            return 0
-        elif node < self and self.left is None:
-            node.parent = self
-            self.left = node
-            return 1
-        elif node > self and self.right is None:
-            node.parent = self
-            self.right = node
-            return 1
-        elif node < self:
-            return self.left.add(node)
-        else:
-            return self.right.add(node)
-
-    def replace_with(self, replacement):
-        print (replacement.key)
-        replacement.parent = self.parent
-        replacement.left = self.left if self.left else replacement.left
-        replacement.right = self.right if self.right else replacement.right
-        if self.parent is not None:
-            if self.parent.left is self:
-                self.parent.left = replacement
-            else:
-                self.parent.right = replacement
-        if self.left is not None:
-            self.left.parent = replacement
-        if self.right is not None:
-            self.right.parent = replacement
-        return replacement
-
-    def delete(self, key):
-        if key < self.key and self.left is not None:
-            return self.left.delete(key)
-        if key > self.key and self.right is not None:
-            return self.right.delete(key)
-        if key != self.key:
-            raise Exception("Element {K} not found".format(K=key))
-        if self.left is not None and self.right is None:
-            return self.replace_with(self.left)
-        elif self.left is None and self.right is not None:
-            return self.replace_with(self.right)
-        else:
-            return self.replace_with(self.right.pop_minimum())
-
-    def pop_minimum(self):
-        if self.left is not None:
-            return self.left.pop_minimum()
-        if self.right is not None:
-            self.right.parent = self.parent
-            if self.parent is not None:
-                self.parent.left = self.right
-        elif self.parent is not None:
-            self.parent.left = None
-        self.parent = None
-        self.right = None
-        self.left = None
-        return self
-
-    def __eq__(self, other):
-        return self.key == other.key
-
-    def __gt__(self, other):
-        return self.key > other.key
-
-    def __lt__(self, other):
-        return self.key < other.key
-
-    def __contains__(self, key):
-        if self.key == key:
-            return True
-        if self.key < key:
-            return key in self.left if self.left is not None else False
-        if self.key > key:
-            return key in self.right if self.right is not None else False
+def test_linked_list_single_item():
+    """test_linked_list_single_item."""
+    ll = SinglyLinkedList()
+    ll.prepend(5)
+    assert ll.head.item is 5
+    print("One item, ", ll)
+    for node in ll:
+        assert node.item is 5
+    assert 5 in ll
+    assert not any(value in ll for value in range(-100, 100) if value is not 5)
+    assert len(ll) is 1
+    assert ll.remove(5) is 5
+    assert 5 not in ll
+    assert len(ll) is 0
+    for _ in ll:
+        raise AssertionError("Collection should be empty, iterator returned.")
+    print("Passed all tests for single item in linked list")
 
 
-class BinarySearchTreeDict(object):
-
-    def __init__(self):
-        super(BinarySearchTreeDict, self).__init__()
-        self.root = None
-        self.size = 0
-
-    @property
-    def height(self):
-        if self.root is None:
-            return 0
-        return self.root.height()
-
-    def inorder_keys(self):
-        if self.root is None:
-            return iter(())
-        return (key for key, _ in self.items())
-
-    def postorder_keys(self):
-        if self.root is None:
-            return iter(())
-        return (key for key, _ in self.root.postorder())
-
-    def preorder_keys(self):
-        if self.root is None:
-            return iter(())
-        return (key for key, _ in self.root.preorder())
-
-    def items(self):
-        if self.root is None:
-            return iter(())
-        return self.root.inorder()
-
-    def __getitem__(self, key):
-        # TODO: Get the VALUE associated with key
-        for k, v in self.items():
-            if key == v:
-                return v
-        return None
-
-    def __setitem__(self, key, data):
-        # TODO:
-        node = BinaryTreeNode(key=key, data=data)
-        if self.root is None:
-            self.root = node
-            self.size += 1
-        else:
-            self.size += self.root.add(node)
-
-    def __delitem__(self, key):
-        # TODO
-        if self.root is None:
-            return
-        replacement = self.root.delete(key)
-        if self.root.key == key:
-            self.root = replacement
-
-    def __contains__(self, key):
-        # TODO
-        return self.root is not None and key in self.root
-
-    def __len__(self):
-        # TODO
-        return self.size
-
-    def display(self):
-        # TODO: Print the keys using INORDER on one
-        #      line and PREORDER on the next
-        return (
-            ", ".join(str(k) for k in self.inorder_keys()) + "\n" +
-            ", ".join(str(k) for k in self.preorder_keys())
-            )
+def test_linked_list_many_items():
+    """test_linked_list_many_items."""
+    ll = SinglyLinkedList()
+    numbers = [value for value in range(-100, 100)]
+    for number in numbers:
+        ll.prepend(number)
+    print("Many items, ", ll)
+    assert len(ll) == len(numbers)
+    assert [node.item for node in ll] == numbers[-1::-1]
+    assert all(number in ll for number in numbers)
+    assert not any(
+        number in ll for number in chain(range(-200, -100), range(100, 200)))
+    assert ll.remove(500) is None
+    assert all(ll.remove(value) is not None for value in numbers)
+    assert not any(number in ll for number in numbers)
+    assert len(ll) is 0
+    for _ in ll:
+        raise AssertionError("Collection should be empty, iterator returned.")
+    print("Passed all tests for single item in linked list")
 
 
-# =============================================================================
-
-
-class ChainedHashDict(object):
-
-    def __init__(self, bin_count=10, max_load=0.7, hashfunc=hash):
-        super(ChainedHashDict, self).__init__()
-        # TODO: Construct a new table
+def test_bst_empty():
+    """test_bst_empty."""
+    bst = BinarySearchTreeDict()
+    assert len(bst) is 0
+    assert not any(number in bst for number in range(-100, 100))
+    for _ in bst.inorder_keys():
+        raise Exception("Collection should be empty, iterator returned.")
+    for _ in bst.preorder_keys():
+        raise Exception("Collection should be empty, iterator returned.")
+    for _ in bst.postorder_keys():
+        raise Exception("Collection should be empty, iterator returned.")
+    try:
+        bst[0]
+    except KeyError:
         pass
-
-    @property
-    def load_factor(self):
-        # TODO
+    else:
+        raise AssertionError("Got 0 from an empty tree.")
+    try:
+        del bst[0]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Got 0 from an empty tree.")
+    assert len(bst) is 0
+    assert bst.height is 0
+    print(bst)
 
-    @property
-    def bin_count(self):
-        # TODO
+
+def test_bst_one_item():
+    """test_bst_one_item."""
+    bst = BinarySearchTreeDict()
+    bst[0] = 1
+    assert bst[0] is 1
+    assert len(bst) is 1
+    assert bst.height is 0
+    try:
+        bst[1]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Got 1 from a tree that only has 0 in it.")
+    print(bst)
+    del bst[0]
+    assert len(bst) is 0
+    assert 0 not in bst
 
-    def rebuild(self, bincount):
-        # Rebuild this hash table with a new bin count
-        # TODO
+
+def test_bst_many_items():
+    """test_bst_many_items."""
+    bst = BinarySearchTreeDict()
+    pairs = [['a', 1], ['b', 2], ['c', 3], ['d', 4], ['e', 5], ['f', 6]]
+    for key, value in pairs:
+        bst[key] = value
+    print(bst)
+    assert len(bst) == len(pairs)
+    assert bst.height == len(pairs) - 1
+    assert all(key in bst and bst[key] == value for key, value in pairs)
+    assert [[k, bst[k]] for k in bst.inorder_keys()] == pairs
+    assert [[k, bst[k]] for k in bst.preorder_keys()] == pairs
+    assert [[k, bst[k]] for k in bst.postorder_keys()] == pairs[-1::-1]
+    del bst['d']
+    print(bst)
+    assert len(bst) == len(pairs) - 1
+    assert bst.height == len(pairs) - 2
+    assert all(
+        key in bst and bst[key] == value for key, value in pairs if key != 'd')
+
+    print("Mutating existing keys.")
+    incremented_pairs = [[k, v + 1] for k, v in pairs]
+    for key, value in incremented_pairs:
+        bst[key] = value
+    print(bst)
+    assert len(bst) == len(incremented_pairs)
+    assert all(
+        key in bst and bst[key] == value for key, value in incremented_pairs)
+
+    print("Shuffling input")
+    for k, _ in incremented_pairs:
+        del bst[k]
+    assert len(bst) is 0
+    shuffled = incremented_pairs
+    shuffle(shuffled)
+    for key, value in shuffled:
+        bst[key] = value
+    print(bst)
+    assert len(bst) == len(shuffled)
+    assert all(
+        key in bst and bst[key] == value for key, value in shuffled)
+
+
+def test_chained_hash_dict_empty():
+    """test_chained_hash_dict_empty."""
+    chd = ChainedHashDict()
+    print(chd)
+    assert len(chd) is 0
+    for _ in chd:
+        raise Exception("Collection should be empty, iterator returned.")
+    try:
+        del chd[0]
+    except KeyError:
         pass
-
-    def __getitem__(self, key):
-        # TODO: Get the VALUE associated with key
+    else:
+        raise AssertionError("Deleted from an empty CHD")
+    try:
+        chd[0]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Got from an empty CHD")
+    print("Passed empty ChainedHashDict")
 
-    def __setitem__(self, key, value):
-        # TODO:
+
+def test_chained_hash_dict_one_item():
+    """test_chained_hash_dict_one_item."""
+    chd = ChainedHashDict()
+    chd[0] = 1
+    print(chd)
+    for k, v in chd:
+        assert k is 0 and v is 1
+    assert len(chd) is 1
+    chd[0]
+    try:
+        chd[10]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Accessed element using wrong key.")
+    del chd[0]
+    assert len(chd) is 0
+    for _, _ in chd:
+        raise Exception("Collection should be empty, iterator returned.")
+    print("Passed single item ChainedHashDict")
 
-    def __delitem__(self, key):
-        # TODO
+
+def test_chained_hash_dict_many_items():
+    """test_chained_hash_dict_many_items."""
+    chd = ChainedHashDict()
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        chd[key] = value
+        test_dict[key] = value
+    assert len(chd) == len(test_dict)
+    for k, v in test_dict.items():
+        assert chd[k] == v
+    print(chd)
+    print("Passed many item ChainedHashDict")
+
+
+def test_chained_hash_dict_bad_hash():
+    """test_chained_hash_dict_bad_hash."""
+    chd = ChainedHashDict(hashfunc=terrible_hash(5))
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        chd[key] = value
+        test_dict[key] = value
+    assert len(chd) == len(test_dict)
+    for k, v in test_dict.items():
+        assert chd[k] == v
+    print(chd)
+    print("Passed bad hash ChainedHashDict")
+
+
+def test_open_addressed_dict_empty():
+    """test_open_addressed_dict_empty."""
+    oad = OpenAddressHashDict()
+    print(oad)
+    assert len(oad) is 0
+    for _ in oad:
+        raise Exception("Collection should be empty, iterator returned.")
+    try:
+        del oad[0]
+    except KeyError:
         pass
-
-    def __contains__(self, key):
-        # TODO
+    else:
+        raise AssertionError("Deleted from an empty oad")
+    try:
+        oad[0]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Got from an empty oad")
+    print("Passed empty OpenAddressHashDict")
 
-    def __len__(self):
-        # TODO
+
+def test_open_addressed_dict_one_item():
+    """test_open_addressed_dict_one_item."""
+    oad = OpenAddressHashDict()
+    oad[0] = 1
+    print(oad)
+    for k, v in oad:
+        assert k is 0 and v is 1
+    assert len(oad) is 1
+    oad[0]
+    try:
+        oad[10]
+    except KeyError:
         pass
+    else:
+        raise AssertionError("Accessed element using wrong key.")
+    del oad[0]
+    assert len(oad) is 0
+    for _, _ in oad:
+        raise Exception("Collection should be empty, iterator returned.")
+    print("Passed single item OpenAddressHashDict")
 
-    def display(self):
-        # TODO: Return a string showing the table with multiple lines
-        # TODO: I want the string to show which items are in which bins
-        pass
+
+def test_open_addressed_dict_many_items():
+    """test_open_addressed_dict_many_items."""
+    oad = OpenAddressHashDict()
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed many item OpenAddressHashDict")
 
 
-class OpenAddressHashDict(object):
-
-    def __init__(self, bin_count=10, max_load=0.7, hashfunc=hash):
-        super(OpenAddressHashDict, self).__init__()
-
-        # TODO initialize
-        pass
-
-    @property
-    def load_factor(self):
-        # TODO
-        pass
-
-    @property
-    def bin_count(self):
-        # TODO
-        pass
-
-    def rebuild(self, bincount):
-        # Rebuild this hash table with a new bin count
-        # TODO
-        pass
-
-    def __getitem__(self, key):
-        # TODO: Get the VALUE associated with key
-        pass
-
-    def __setitem__(self, key, value):
-        # TODO:
-        pass
-
-    def __delitem(self, key):
-        # TODO
-        pass
-
-    def __contains__(self, key):
-        # TODO
-        pass
-
-    def __len__(self):
-        # TODO
-        pass
-
-    def display(self):
-        # TODO: Return a string showing the table with multiple lines
-        # TODO: I want the string to show which items are in which bins
-        pass
+def test_open_addressed_dict_bad_hash():
+    """test_open_addressed_dict_bad_hash."""
+    oad = OpenAddressHashDict(hashfunc=terrible_hash(5))
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed bad hash OpenAddressHashDict")
 
 
 def terrible_hash(bin):
@@ -415,14 +326,14 @@ def terrible_hash(bin):
 
 
 def main():
-    b = BinarySearchTreeDict()
-    b['b'] = 1
-    b['a'] = 2
-    b['c'] = 3
-    print (b.root.right.data)
-    # print(b.display())
-    del b["b"]
-    print(b.display())
+    """Main test function."""
+    tests = [
+        f for name, f in sorted(globals().items()) if
+        isinstance(f, FunctionType) and
+        name.startswith("test")
+        ]
+    for test in tests:
+        test()
     # Thoroughly test your program and produce useful out.
     #
     # Do at least these kinds of tests:

@@ -1,37 +1,54 @@
+# -*- coding: utf-8 -*-
+"""Assignment 3 Open Addressed Hashing Dictionary."""
 from __future__ import division
 
 
 class DELETED(object):
+    """"Representative of a deleted key."""
 
     class key(object):
+        """Faking a pair key."""
+
         pass
 
     class value(object):
+        """Faking a pair value."""
+
         pass
 
 
 class EMPTY(object):
+    """"Representative of an empty key."""
 
     class key(object):
+        """Faking a pair key."""
+
         pass
 
     class value(object):
+        """Faking a pair value."""
+
         pass
 
 
 class Pair(object):
+    """A key value pair in the dictionary."""
 
     def __init__(self, key, value):
+        """__init__."""
         self.key = key
         self.value = value
 
     def __str__(self):
+        """__str__."""
         return "Key: {K}, Value: {V}".format(K=self.key, V=self.value)
 
 
 class OpenAddressHashDict(object):
+    """An open addressed hashing dictionary. Linear probing."""
 
     def __init__(self, bin_count=10, max_load=0.7, hashfunc=hash):
+        """__init__."""
         super(OpenAddressHashDict, self).__init__()
         if bin_count <= 0:
             raise TypeError("Bin count must be greater than zero.")
@@ -42,13 +59,16 @@ class OpenAddressHashDict(object):
 
     @property
     def load_factor(self):
+        """load_factor."""
         return self.size / self.bin_count
 
     @property
     def bin_count(self):
+        """bin_count."""
         return len(self.table)
 
     def rebuild(self, bincount):
+        """rebuild."""
         tmp = self.table
         self.table = [EMPTY for _ in range(bincount)]
         self.size = 0
@@ -58,10 +78,17 @@ class OpenAddressHashDict(object):
 
     @property
     def should_rebuild(self):
+        """should_rebuild."""
         return self.load_factor >= self.max_load
 
+    def __iter__(self):
+        """__iter__."""
+        for entry in self.table:
+            if isinstance(entry, Pair):
+                yield entry.key, entry.value
+
     def __getitem__(self, key):
-        # TODO: Get the VALUE associated with key
+        """__getitem__."""
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY:
@@ -72,6 +99,7 @@ class OpenAddressHashDict(object):
         raise KeyError("{KEY} not found.".format(KEY=key))
 
     def __setitem__(self, key, value):
+        """__setitem__."""
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY and pair is not DELETED:
@@ -86,7 +114,7 @@ class OpenAddressHashDict(object):
             self.rebuild(self.bin_count * 2)
 
     def __delitem__(self, key):
-        # TODO
+        """__delitem__."""
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY:
@@ -99,25 +127,28 @@ class OpenAddressHashDict(object):
         raise KeyError()
 
     def __contains__(self, key):
-        # TODO
+        """__contains__."""
         try:
             self[key]
-        except:
+        except Exception:
             return False
         else:
             return True
 
     def __len__(self):
-        # TODO
+        """__len__."""
         return self.size
 
     def address(self, key):
+        """address."""
         return self.hash(key) % self.bin_count
 
     def display(self):
-        print (str(self))
+        """display."""
+        print(str(self))
 
     def __str__(self):
+        """__str__."""
         string = "{\n"
         for index, pair in enumerate(self.table):
             string += "\t[{BIN}]=> {PAIR}\n".format(
@@ -127,29 +158,3 @@ class OpenAddressHashDict(object):
                     "DELETED" if pair is DELETED else "EMPTY"))
         string += "}"
         return string
-
-m = OpenAddressHashDict()
-for i in range(20):
-    m[i] = i
-print(m.size)
-m.display()
-
-# m[1] = 1
-# del m[1]
-# print(len(m))
-# m.display()
-# m[1] = 1
-# m.display()
-# print(len(m))
-
-# from random import randrange
-# keys = set()
-# for i in range(100):
-#     if i and i % 5 is 0:
-#         del m[keys.pop()]
-#     else:
-#         key = randrange(-100, 100)
-#         m[key] = randrange(-100, 100)
-#         keys.add(key)
-# m.display()
-# print (len(m))
