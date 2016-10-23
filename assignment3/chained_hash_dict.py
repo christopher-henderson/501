@@ -40,8 +40,9 @@ class ChainedHashDict(object):
 
     def items(self):
         for linked_list in self.table:
-            for node in linked_list:
-                yield node.key, node.value
+            yield from linked_list
+            # for node in linked_list:
+            #     yield node.key, node.value
 
     def __getitem__(self, key):
         # TODO: Get the VALUE associated with key
@@ -98,5 +99,7 @@ m = ChainedHashDict()
 from random import randrange
 for _ in range(100):
     m[randrange(-100, 100)] = randrange(-100, 100)
-m.display()
-print (len(m))
+# m.display()
+for i in m.items():
+    print(i)
+print(len(m))

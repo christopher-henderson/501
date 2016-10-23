@@ -48,18 +48,15 @@ class SinglyLinkedList(object):
         self.length = 0
 
     def __len__(self):
-        # TODO
         return self.length
 
     def __iter__(self):
-        # TODO
         node = self.head
         while node is not None:
             yield node
             node = node.next
 
     def __contains__(self, item):
-        # TODO
         for node in self:
             if node.item == item:
                 return True
@@ -85,7 +82,6 @@ class SinglyLinkedList(object):
         return None
 
     def prepend(self, item, key=None):
-        # TODO ad item to the front of the list
         node = SinglyLinkedNode(item=item, key=key)
         if self.head is None:
             self.head = node
@@ -94,9 +90,5 @@ class SinglyLinkedList(object):
             self.head = node
         self.length += 1
 
-    def delete_by_key(self, key):
-        pass
-
     def __repr__(self):
-        s = "List: " + " -> ".join([str(item) for item in self])
-        return s
+        return "List: " + " -> ".join([str(item) for item in self])

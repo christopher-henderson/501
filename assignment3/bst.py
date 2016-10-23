@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 class NullBinaryTreeNode(object):
 
     SINGLETON = None
@@ -40,7 +43,7 @@ class NullBinaryTreeNode(object):
         return False
 
     def __getitem__(self, key):
-        return None
+        raise KeyError("Element {K} not found".format(K=key))
 
     @property
     def parent(self):
@@ -70,7 +73,7 @@ class NullBinaryTreeNode(object):
         return
 
     def delete(self, key):
-        raise Exception("Element {K} not found".format(K=key))
+        raise KeyError("Element {K} not found".format(K=key))
 
     def add(self, key, data):
         return BinaryTreeNode(key=key, data=data)
@@ -113,25 +116,19 @@ class BinaryTreeNode(object):
         return self
 
     def inorder(self):
-        for k, v in self.left.inorder():
-            yield k, v
+        yield from self.left.inorder()
         yield self.key, self.data
-        for k, v in self.right.inorder():
-            yield k, v
+        yield from self.right.inorder()
 
     def postorder(self):
-        for k, v in self.left.inorder():
-            yield k, v
-        for k, v in self.right.inorder():
-            yield k, v
+        yield from self.left.postorder()
+        yield from self.right.postorder()
         yield self.key, self.data
 
     def preorder(self):
         yield self.key, self.data
-        for k, v in self.left.inorder():
-            yield k, v
-        for k, v in self.right.inorder():
-            yield k, v
+        yield from self.left.preorder()
+        yield from self.right.preorder()
 
     def height(self, height=-1):
         height += 1
@@ -224,6 +221,7 @@ class BinaryTreeNode(object):
             return self.key < other.key
         return self.key <= other
 
+
 class BinarySearchTreeDict(object):
 
     def __init__(self):
@@ -285,13 +283,12 @@ def main():
     b['c'] = 3
     b['d'] = 3
     b['j'] = 3
-    # print(b.display())
+    print(b.display())
     # print(b.height)
-    print(b.root.key)
-    del b["i"]
-    print(b.root.key)
+    # print(b.root.key)
+    # del b["i"]
+    # print(b.root.key)
     # print("i" in b)
-
 
 
 

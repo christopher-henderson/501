@@ -1,7 +1,5 @@
 from __future__ import division
 
-from linked_list import SinglyLinkedNode
-
 
 class DELETED(object):
 
@@ -27,9 +25,9 @@ class Pair(object):
         self.key = key
         self.value = value
 
-
     def __str__(self):
         return "Key: {K}, Value: {V}".format(K=self.key, V=self.value)
+
 
 class OpenAddressHashDict(object):
 
@@ -44,17 +42,13 @@ class OpenAddressHashDict(object):
 
     @property
     def load_factor(self):
-        # TODO
         return self.size / self.bin_count
 
     @property
     def bin_count(self):
-        # TODO
         return len(self.table)
 
     def rebuild(self, bincount):
-        # Rebuild this hash table with a new bin count
-        # TODO
         tmp = self.table
         self.table = [EMPTY for _ in range(bincount)]
         self.size = 0
@@ -75,7 +69,7 @@ class OpenAddressHashDict(object):
                 return pair.value
             address = (address + 1) % self.bin_count
             pair = self.table[address]
-        raise KeyError()
+        raise KeyError("{KEY} not found.".format(KEY=key))
 
     def __setitem__(self, key, value):
         address = self.address(key)
@@ -89,7 +83,7 @@ class OpenAddressHashDict(object):
         self.table[address] = Pair(key, value)
         self.size += 1
         if self.should_rebuild:
-            self.rebuild(self.bin_count*2)
+            self.rebuild(self.bin_count * 2)
 
     def __delitem__(self, key):
         # TODO
@@ -124,8 +118,6 @@ class OpenAddressHashDict(object):
         print (str(self))
 
     def __str__(self):
-        # TODO: Return a string showing the table with multiple lines
-        # TODO: I want the string to show which items are in which bins
         string = "{\n"
         for index, pair in enumerate(self.table):
             string += "\t[{BIN}]=> {PAIR}\n".format(
@@ -140,6 +132,7 @@ m = OpenAddressHashDict()
 for i in range(20):
     m[i] = i
 print(m.size)
+m.display()
 
 # m[1] = 1
 # del m[1]
