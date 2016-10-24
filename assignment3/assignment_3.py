@@ -422,7 +422,11 @@ def terrible_hash(bin):
 
 
 def main():
-    """Main test function."""
+    """Main test function.
+
+    Emulates nosetests. Searches the global dictionary for functions that
+    start with "test" and executes them.
+    """
     tests = [
         f for name, f in sorted(globals().items()) if
         isinstance(f, FunctionType) and
@@ -430,20 +434,6 @@ def main():
         ]
     for test in tests:
         test()
-    # Thoroughly test your program and produce useful out.
-    #
-    # Do at least these kinds of tests:
-    #  (1)  Check the boundary conditions (empty containers,
-    #       full containers, etc)
-    #  (2)  Test your hash tables for terrible hash functions
-    #       that map to keys in the middle or ends of your
-    #       table
-    #  (3)  Check your table on 100s or randomly generated
-    #       sets of keys to make sure they function
-    #
-    #  (4)  Make sure that no keys / items are lost, especially
-    #       as a result of deleting another key
-    pass
 
 
 if __name__ == '__main__':
