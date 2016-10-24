@@ -229,6 +229,54 @@ def test_chained_hash_dict_bad_hash():
     print("Passed bad hash ChainedHashDict")
 
 
+def test_chained_hash_dict_low_load_factor():
+    """test_chained_hash_dict_low_load_factor."""
+    oad = ChainedHashDict(max_load=0.1)
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed low load OpenAddressHashDict")
+
+
+def test_chained_hash_dict_del():
+    """test_chained_hash_dict_del."""
+    oad = ChainedHashDict()
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    num_deleted = 0
+    deleted = dict()
+    keys = [k for k in test_dict.keys()]
+    for key in keys:
+        deleted[key] = test_dict[key]
+        del test_dict[key]
+        del oad[key]
+        num_deleted += 1
+        if num_deleted >= 500:
+            break
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    for k, v in deleted.items():
+        assert k not in oad
+    for k, v in deleted.items():
+        oad[k] = v
+        test_dict[k] = v
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed OpenAddressHashDict deletion.")
+
+
 def test_open_addressed_dict_empty():
     """test_open_addressed_dict_empty."""
     oad = OpenAddressHashDict()
@@ -301,6 +349,54 @@ def test_open_addressed_dict_bad_hash():
         assert oad[k] == v
     print(oad)
     print("Passed bad hash OpenAddressHashDict")
+
+
+def test_open_addressed_dict_low_load_factor():
+    """test_open_addressed_dict_low_load_factor."""
+    oad = OpenAddressHashDict(max_load=0.1)
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed low load OpenAddressHashDict")
+
+
+def test_open_addressed_dict_del():
+    """test_open_addressed_dict_del."""
+    oad = OpenAddressHashDict()
+    test_dict = dict()
+    for key in (randrange(-100, 100) for _ in range(1000)):
+        value = randrange(-100, 100)
+        oad[key] = value
+        test_dict[key] = value
+    num_deleted = 0
+    deleted = dict()
+    keys = [k for k in test_dict.keys()]
+    for key in keys:
+        deleted[key] = test_dict[key]
+        del test_dict[key]
+        del oad[key]
+        num_deleted += 1
+        if num_deleted >= 500:
+            break
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    for k, v in deleted.items():
+        assert k not in oad
+    for k, v in deleted.items():
+        oad[k] = v
+        test_dict[k] = v
+    assert len(oad) == len(test_dict)
+    for k, v in test_dict.items():
+        assert oad[k] == v
+    print(oad)
+    print("Passed OpenAddressHashDict deletion.")
 
 
 def terrible_hash(bin):
