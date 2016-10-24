@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Assignment 3 Open Addressed Hashing Dictionary."""
 from __future__ import division
