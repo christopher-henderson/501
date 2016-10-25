@@ -33,7 +33,7 @@ def test_linked_list_single_item():
     assert ll.head.item is 5
     print("One item, ", ll)
     for node in ll:
-        assert node.item is 5
+        assert node is 5
     assert 5 in ll
     assert not any(value in ll for value in range(-100, 100) if value is not 5)
     assert len(ll) is 1
@@ -53,7 +53,7 @@ def test_linked_list_many_items():
         ll.prepend(number)
     print("Many items, ", ll)
     assert len(ll) == len(numbers)
-    assert [node.item for node in ll] == numbers[-1::-1]
+    assert [node.item for node in ll.nodes()] == numbers[-1::-1]
     assert all(number in ll for number in numbers)
     assert not any(
         number in ll for number in chain(range(-200, -100), range(100, 200)))
@@ -77,20 +77,10 @@ def test_bst_empty():
         raise Exception("Collection should be empty, iterator returned.")
     for _ in bst.postorder_keys():
         raise Exception("Collection should be empty, iterator returned.")
-    try:
-        bst[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Got 0 from an empty tree.")
-    try:
-        del bst[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Got 0 from an empty tree.")
+    assert bst[0] is None
+    bst.__delitem__(0) is None
     assert len(bst) is 0
-    assert bst.height is 0
+    assert bst.height is -1
     print(bst)
 
 
@@ -101,12 +91,7 @@ def test_bst_one_item():
     assert bst[0] is 1
     assert len(bst) is 1
     assert bst.height is 0
-    try:
-        bst[1]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Got 1 from a tree that only has 0 in it.")
+    assert bst[1] is None
     print(bst)
     del bst[0]
     assert len(bst) is 0
@@ -163,18 +148,8 @@ def test_chained_hash_dict_empty():
     assert len(chd) is 0
     for _ in chd:
         raise Exception("Collection should be empty, iterator returned.")
-    try:
-        del chd[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Deleted from an empty CHD")
-    try:
-        chd[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Got from an empty CHD")
+    assert chd.__delitem__(0) is None
+    assert chd[0] is None
     print("Passed empty ChainedHashDict")
 
 
@@ -187,12 +162,7 @@ def test_chained_hash_dict_one_item():
         assert k is 0 and v is 1
     assert len(chd) is 1
     chd[0]
-    try:
-        chd[10]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Accessed element using wrong key.")
+    assert chd[10] is None
     del chd[0]
     assert len(chd) is 0
     for _, _ in chd:
@@ -285,18 +255,8 @@ def test_open_addressed_dict_empty():
     assert len(oad) is 0
     for _ in oad:
         raise Exception("Collection should be empty, iterator returned.")
-    try:
-        del oad[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Deleted from an empty oad")
-    try:
-        oad[0]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Got from an empty oad")
+    assert oad.__delitem__(0) is None
+    assert oad[0] is None
     print("Passed empty OpenAddressHashDict")
 
 
@@ -309,12 +269,7 @@ def test_open_addressed_dict_one_item():
         assert k is 0 and v is 1
     assert len(oad) is 1
     oad[0]
-    try:
-        oad[10]
-    except KeyError:
-        pass
-    else:
-        raise AssertionError("Accessed element using wrong key.")
+    assert oad[10] is None
     del oad[0]
     assert len(oad) is 0
     for _, _ in oad:

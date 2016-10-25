@@ -51,7 +51,7 @@ class ChainedHashDict(object):
     def __iter__(self):
         """__iter__."""
         for linked_list in self.table:
-            for node in linked_list:
+            for node in linked_list.nodes():
                 yield node.key, node.item
 
     def __getitem__(self, key):

@@ -90,7 +90,7 @@ class SinglyLinkedList(object):
 
     def __contains__(self, item):
         """__contains__."""
-        for node in self:
+        for node in self.nodes():
             if node.item == item:
                 return True
         return None

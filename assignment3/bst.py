@@ -58,7 +58,7 @@ class NullBinaryTreeNode(object):
 
     def __getitem__(self, key):
         """__getitem__."""
-        raise KeyError("Element {K} not found".format(K=key))
+        return None
 
     @property
     def parent(self):
@@ -96,7 +96,7 @@ class NullBinaryTreeNode(object):
 
     def delete(self, key):
         """delete."""
-        raise KeyError("Element {K} not found".format(K=key))
+        return None
 
     def add(self, key, data):
         """add."""
