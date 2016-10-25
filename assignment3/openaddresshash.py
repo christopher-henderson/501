@@ -55,7 +55,7 @@ class OpenAddressHashDict(object):
             raise TypeError("Bin count must be greater than zero.")
         self.table = [EMPTY for _ in range(bin_count)]
         self.max_load = max_load
-        self.hash = hash
+        self.hash = hashfunc
         self.size = 0
 
     @property
