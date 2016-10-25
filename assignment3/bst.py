@@ -114,7 +114,7 @@ class NullBinaryTreeNode(object):
         """postorder."""
         return iter(())
 
-    def height(self, height=0):
+    def height(self, height=-1):
         """height."""
         return height
 
@@ -281,6 +281,11 @@ class BinarySearchTreeDict(object):
         self.size = 0
 
     @property
+    def length(self):
+        """length."""
+        return self.size
+
+    @property
     def height(self):
         """height."""
         return self.root.height()
@@ -297,24 +302,38 @@ class BinarySearchTreeDict(object):
         """preorder_keys."""
         return (k for k, _ in self.root.preorder())
 
+    def _items(self):
+        """_items."""
+        return [list(item) for item in self.items()]
+
     def items(self):
         """items."""
         return self.root.inorder()
 
     def __getitem__(self, key):
         """__getitem__."""
+        if key is None:
+            return None
         return self.root[key]
 
     def __setitem__(self, key, value):
         """__setitem__."""
+        if key is None:
+            return None
         if key not in self:
             self.size += 1
         self.root = self.root.add(key, value)
+        return True
 
     def __delitem__(self, key):
         """__delitem__."""
+        if key is None:
+            return None
+        if key not in self:
+            return None
         self.root = self.root.delete(key)
         self.size -= 1
+        return True
 
     def __contains__(self, key):
         """__contains__."""
@@ -327,9 +346,9 @@ class BinarySearchTreeDict(object):
     def __str__(self):
         """__str__."""
         return (
-            "Inorder: " + ", ".join(str(k) for k in self.inorder_keys()) +
+            "Inorder:" + "->".join(str(k) for k in self.inorder_keys()) +
             "\n" +
-            "Preorder: " + ", ".join(str(k) for k in self.preorder_keys())
+            "Preorder:" + "->".join(str(k) for k in self.preorder_keys())
             )
 
     def __repr__(self):
@@ -338,4 +357,4 @@ class BinarySearchTreeDict(object):
 
     def display(self):
         """display."""
-        print(self)
+        return str(self).split("\n")

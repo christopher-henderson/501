@@ -55,6 +55,11 @@ class SinglyLinkedNode(object):
         """__repr__."""
         return repr(self.item)
 
+    def __str__(self):
+        if not self.key:
+            return str(self.item)
+        return str([self.key, self.item])
+
 
 class SinglyLinkedList(object):
     """Singly Linked List."""
@@ -73,6 +78,13 @@ class SinglyLinkedList(object):
         """__iter__."""
         node = self.head
         while node is not None:
+            yield node.item
+            node = node.next
+
+    def nodes(self):
+        """nodes."""
+        node = self.head
+        while node is not None:
             yield node
             node = node.next
 
@@ -81,7 +93,7 @@ class SinglyLinkedList(object):
         for node in self:
             if node.item == item:
                 return True
-        return False
+        return None
 
     def remove(
             self,
@@ -119,10 +131,11 @@ class SinglyLinkedList(object):
             node.next = self.head
             self.head = node
         self.length += 1
+        return node
 
     def __repr__(self):
         """__repr__."""
-        return "List: " + " -> ".join([str(item) for item in self])
+        return "List:" + "->".join([str(item) for item in self.nodes()])
 
     def __str__(self):
         """__str__."""

@@ -40,7 +40,7 @@ class ChainedHashDict(object):
         self.table = [SinglyLinkedList() for _ in range(bincount)]
         self.size = 0
         for linked_list in tmp:
-            for node in linked_list:
+            for node in linked_list.nodes():
                 self[node.key] = node.item
         del tmp
 
@@ -58,15 +58,18 @@ class ChainedHashDict(object):
         """__getitem__."""
         address = self._address(key)
         chain = self.table[address]
-        for node in chain:
+        for node in chain.nodes():
             if node.key == key:
                 return node.item
-        raise KeyError("{KEY} not found.".format(KEY=key))
+        return None
+        # raise KeyError("{KEY} not found.".format(KEY=key))
 
     def __setitem__(self, key, value):
         """__setitem__."""
+        if key is None:
+            return None
         address = self._address(key)
-        for node in self.table[address]:
+        for node in self.table[address].nodes():
             if node.key == key:
                 node.item = value
                 return
@@ -74,23 +77,31 @@ class ChainedHashDict(object):
         self.size += 1
         if self.should_resize:
             self.rebuild(self.bin_count * 2)
+        return True
 
     def __delitem__(self, key):
         """__delitem__."""
+        if key is None:
+            return None
+        if key not in self:
+            return None
         address = self._address(key)
         self.table[address].remove(
             key,
             lambda node, key: node.key == key,
             fail=True)
         self.size -= 1
+        return True
 
     def __contains__(self, key):
         """__contains__."""
+        if key is None:
+            return None
         address = self._address(key)
-        for node in self.table[address]:
+        for node in self.table[address].nodes():
             if node.key == key:
                 return True
-        return False
+        return None
 
     def __len__(self):
         """__len__."""
@@ -98,15 +109,24 @@ class ChainedHashDict(object):
 
     def __str__(self):
         """__str__."""
-        string = "{\n"
+        string = ""
         for index, linked_list in enumerate(self.table):
-            string += "\t[{BIN}]=> {LIST}\n".format(
+            string += "{BIN}{LIST}\n".format(
                 BIN=index, LIST=linked_list)
-        return string + "}"
+        return string.strip()
 
     def __repr__(self):
         """__repr__."""
         return str(self)
+
+    @property
+    def len(self):
+        """len."""
+        return len(self)
+
+    def __len__(self):
+        """__len__."""
+        return self.size
 
     def display(self):
         """display."""

@@ -90,6 +90,8 @@ class OpenAddressHashDict(object):
 
     def __getitem__(self, key):
         """__getitem__."""
+        if key is None:
+            return None
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY:
@@ -97,10 +99,12 @@ class OpenAddressHashDict(object):
                 return pair.value
             address = (address + 1) % self.bin_count
             pair = self.table[address]
-        raise KeyError("{KEY} not found.".format(KEY=key))
+        return None
 
     def __setitem__(self, key, value):
         """__setitem__."""
+        if key is None:
+            return None
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY and pair is not DELETED:
@@ -113,32 +117,35 @@ class OpenAddressHashDict(object):
         self.size += 1
         if self.should_rebuild:
             self.rebuild(self.bin_count * 2)
+        return True
 
     def __delitem__(self, key):
         """__delitem__."""
+        if key is None or key not in self:
+            return None
         address = self.address(key)
         pair = self.table[address]
         while pair is not EMPTY:
             if pair.key == key:
                 self.table[address] = DELETED
                 self.size -= 1
-                return
+                return True
             address = (address + 1) % self.bin_count
             pair = self.table[address]
-        raise KeyError()
+        return None
 
     def __contains__(self, key):
         """__contains__."""
-        try:
-            self[key]
-        except Exception:
-            return False
-        else:
-            return True
+        return self[key] is not None
 
     def __len__(self):
         """__len__."""
         return self.size
+
+    @property
+    def len(self):
+        """len."""
+        return len(self)
 
     def address(self, key):
         """address."""
@@ -146,16 +153,15 @@ class OpenAddressHashDict(object):
 
     def display(self):
         """display."""
-        print(str(self))
+        return str(self)
 
     def __str__(self):
         """__str__."""
-        string = "{\n"
+        string = ""
         for index, pair in enumerate(self.table):
-            string += "\t[{BIN}]=> {PAIR}\n".format(
+            string += "bin {BIN}: {PAIR}\n".format(
                 BIN=index,
                 PAIR=(
-                    pair if isinstance(pair, Pair) else
-                    "DELETED" if pair is DELETED else "EMPTY"))
-        string += "}"
-        return string
+                    str([pair.key, pair.value]) if isinstance(pair, Pair) else
+                    "DELETED" if pair is DELETED else "[None, None]"))
+        return string.strip()
