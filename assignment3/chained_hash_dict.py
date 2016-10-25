@@ -46,7 +46,7 @@ class ChainedHashDict(object):
 
     def items(self):
         """items."""
-        yield from self
+        return iter(self)
 
     def __iter__(self):
         """__iter__."""

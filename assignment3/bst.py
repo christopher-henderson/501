@@ -151,21 +151,27 @@ class BinaryTreeNode(object):
 
     def inorder(self):
         """inorder."""
-        yield from self.left.inorder()
+        for k, v in self.left.inorder():
+            yield k, v
         yield self.key, self.data
-        yield from self.right.inorder()
+        for k, v in self.right.inorder():
+            yield k, v
 
     def postorder(self):
         """postorder."""
-        yield from self.left.postorder()
-        yield from self.right.postorder()
+        for k, v in self.left.postorder():
+            yield k, v
+        for k, v in self.right.postorder():
+            yield k, v
         yield self.key, self.data
 
     def preorder(self):
         """preorder."""
         yield self.key, self.data
-        yield from self.left.preorder()
-        yield from self.right.preorder()
+        for k, v in self.left.preorder():
+            yield k, v
+        for k, v in self.right.preorder():
+            yield k, v
 
     def height(self, height=-1):
         """height."""
