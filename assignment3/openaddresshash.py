@@ -55,7 +55,7 @@ class OpenAddressHashDict(object):
             raise TypeError("Bin count must be greater than zero.")
         self.table = [EMPTY for _ in range(bin_count)]
         self.max_load = max_load
-        self.hash = hash
+        self.hash = hashfunc
         self.size = 0
 
     @property
@@ -94,10 +94,12 @@ class OpenAddressHashDict(object):
             return None
         address = self.address(key)
         pair = self.table[address]
+        i = 0
         while pair is not EMPTY:
+            i += 1
             if pair.key == key:
                 return pair.value
-            address = (address + 1) % self.bin_count
+            address = self.address(key, i)
             pair = self.table[address]
         return None
 
@@ -107,11 +109,13 @@ class OpenAddressHashDict(object):
             return None
         address = self.address(key)
         pair = self.table[address]
+        i = 0
         while pair is not EMPTY and pair is not DELETED:
+            i += 1
             if pair.key == key:
                 pair.value = value
                 return
-            address = (address + 1) % self.bin_count
+            address = self.address(key, i)
             pair = self.table[address]
         self.table[address] = Pair(key, value)
         self.size += 1
@@ -125,12 +129,15 @@ class OpenAddressHashDict(object):
             return None
         address = self.address(key)
         pair = self.table[address]
+        i = 0
         while pair is not EMPTY:
+            i += 1
             if pair.key == key:
                 self.table[address] = DELETED
                 self.size -= 1
                 return True
-            address = (address + 1) % self.bin_count
+            address = self.address(key, i)
+            # address = (address + 1) % self.bin_count
             pair = self.table[address]
         return None
 
@@ -147,9 +154,9 @@ class OpenAddressHashDict(object):
         """len."""
         return len(self)
 
-    def address(self, key):
+    def address(self, key, i=0):
         """address."""
-        return self.hash(key) % self.bin_count
+        return (self.hash(key) + i) % self.bin_count
 
     def display(self):
         """display."""
