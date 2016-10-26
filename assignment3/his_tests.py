@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from sys import exit
-from bst import BinarySearchTreeDict
-from chained_hash_dict import ChainedHashDict
-from linked_list import SinglyLinkedList
-from openaddresshash import OpenAddressHashDict
+from christopher_henderson import BinarySearchTreeDict
+from christopher_henderson import ChainedHashDict
+from christopher_henderson import OpenAddressHashDict
+from christopher_henderson import SinglyLinkedList
+
 
 def terrible_hash(bin):
     """A terrible hash function that can be used for testing.

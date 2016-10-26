@@ -3,10 +3,10 @@
 
 """Testing file for assignment 3."""
 
-from bst import BinarySearchTreeDict
-from chained_hash_dict import ChainedHashDict
-from linked_list import SinglyLinkedList
-from openaddresshash import OpenAddressHashDict
+from christopher_henderson import BinarySearchTreeDict
+from christopher_henderson import ChainedHashDict
+from christopher_henderson import OpenAddressHashDict
+from christopher_henderson import SinglyLinkedList
 
 from itertools import chain
 from random import randrange
