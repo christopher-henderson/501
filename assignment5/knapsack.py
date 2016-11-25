@@ -1,8 +1,10 @@
 from time import time
 
+
 def knapsack(max_size, items):
     known = [None for _ in range(max_size + 1)]
     known[0] = 0
+
     def knapsack_closure(size):
         known[size] = known[size] if known[size] is not None else max(
             item[1] + knapsack_closure(size - item[0]) if
@@ -10,6 +12,14 @@ def knapsack(max_size, items):
             for item in items)
         return known[size]
     return knapsack_closure(max_size)
+
+    # def knapsack_closure(size):
+    #     known[size] = known[size] if known[size] is not None else max(
+    #         item[1] + knapsack_closure(size - item[0]) if
+    #         size - item[0] >= 0 else 0
+    #         for item in items)
+    #     return known[size]
+    # return knapsack_closure(max_size)
 
 # items = ((12, 4), (2, 2), (1, 2), (1, 1), (4, 10))
 # print (knapsack(8, items))
