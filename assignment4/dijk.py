@@ -84,15 +84,15 @@ G = [s, t, y, x, z]
 
 def dijkstra(G, s):
     S = set()
-    Q = G
+    Q = [v for v in G]
     heapify(Q)
     while len(Q) is not 0:
-        print(S)
         u = heappop(Q)
         S = S.union(set([u]))
         for e in u.vertices:
             relax(e)
         heapify(Q)
+        print(S)
     return S
 
 
@@ -105,4 +105,4 @@ def relax(edge):
     #     v.parent = u
 
 
-print(dijkstra(G, s))
+dijkstra(G, s)

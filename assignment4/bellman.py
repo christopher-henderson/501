@@ -57,11 +57,11 @@ class Edge(object):
     def __unicode__(self):
         return self.__str__()
 
-s = V('s', 0)
+s = V('s')
 t = V('t')
 y = V('y')
 x = V('x')
-z = V('z')
+z = V('z', 0)
 
 s.vertices = [
     Edge(s, t, 6),
@@ -111,9 +111,10 @@ G = {
 
 def bell(G, s):
     for _ in range(1, len(G['V'])):
+        print(G['V'])
         for edge in G['E']:
             relax(edge)
-        print(G['V'])
+    print(G['V'])
     # E = [Edge(x.parent, x, x.weight) for x in G['V'] if x.parent is not None]
     for edge in G['E']:
         # print (edge.v.weight, edge.u.weight, edge.weight)
@@ -121,22 +122,6 @@ def bell(G, s):
             return False
     return True
 
-# def bell(G, s):
-#     S = set()
-#     Q = G
-#     heapify(Q['V'])
-#     while len(Q['V']) is not 0:
-#         # print(S)
-#         u = heappop(Q['V'])
-#         S = S.union(set([u]))
-#         for e in u.vertices:
-#             relax(e)
-#         heapify(Q['V'])
-#     # print (S)
-#     for edge in G['E']:
-#         if edge.v.weight > edge.u.weight + edge.weight:
-#             return False
-#     return True
 
 def relax(edge):
     # print(edge.u.weight, edge.v.weight, edge.weight,)
@@ -147,5 +132,19 @@ def relax(edge):
     return False
 
 
-print(bell(G, s))
-print(G['V'])
+print(bell(G, z))
+# print(G['V'])
+
+# original 7 weight
+# [(s, 0, None), (t, 9223372036854775807, None), (y, 9223372036854775807, None), (x, 9223372036854775807, None), (z, 9223372036854775807, None)]
+# [(s, 0, None), (t, 6, s), (y, 7, s), (x, 9223372036854775804, y), (z, 9223372036854775803, t)]
+# [(s, 0, None), (t, 6, s), (y, 7, s), (x, 4, y), (z, 2, t)]
+# [(s, 0, None), (t, 2, x), (y, 7, s), (x, 4, y), (z, 2, t)]
+# [(s, 0, None), (t, 2, x), (y, 7, s), (x, 4, y), (z, -2, t)]
+
+# modified 4 weight
+# [(s, 0, None), (t, 9223372036854775807, None), (y, 9223372036854775807, None), (x, 9223372036854775807, None), (z, 9223372036854775807, None)]
+# [(s, 0, None), (t, 6, s), (y, 7, s), (x, 9223372036854775804, y), (z, 9223372036854775803, t)]
+# [(s, 0, None), (t, 6, s), (y, 7, s), (x, 4, y), (z, 2, t)]
+# [(s, 0, None), (t, 2, x), (y, 7, s), (x, 4, y), (z, 2, t)]
+# [(s, 0, None), (t, 2, x), (y, 7, s), (x, 2, z), (z, -2, t)]
